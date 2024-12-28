@@ -1,80 +1,95 @@
 from fastapi import FastAPI, HTTPException
 from ytmusicapi import YTMusic
+from typing import Any, Literal
 
 app = FastAPI()
 ytmusic = YTMusic()
 
-@app.get("/api/youtube/search")
-async def search(query: str):
-    return ytmusic.search(query)
+@app.get("/api/youtube/search/")
+async def search(query: str,
+                 filter: str | None = None,
+                 scope: str | None = None,
+                 limit: int = 20,
+                 ignore_spelling: bool = False):
+    return ytmusic.search(query, filter, scope, limit, ignore_spelling)
 
 @app.get("/api/youtube/get_search_suggestions")
-async def get_search_suggestions(query: str):
-    return ytmusic.get_search_suggestions(query)
+async def get_search_suggestions(query: str,
+                                 detailed_runs: bool = False):
+    return ytmusic.get_search_suggestions(query, detailed_runs)
 
 @app.delete("/api/youtube/remove_search_suggestions")
-async def remove_search_suggestions(query: str):
-    return ytmusic.remove_search_suggestions(query)
+async def remove_search_suggestions(suggestions: list[dict[str, Any]],
+                                    indices: list[int] | None = None):
+    return ytmusic.remove_search_suggestions(suggestions, indices)
 
 @app.get("/api/youtube/get_home")
-async def get_home():
-    return ytmusic.get_home()
+async def get_home(limit: int = 3):
+    return ytmusic.get_home(limit)
 
-@app.get("/api/youtube/get_artist/{artistId}")
-async def get_artist(artistId: str):
-    return ytmusic.get_artist(artistId)
+@app.get("/api/youtube/get_artist/")
+async def get_artist(channelId: str):
+    return ytmusic.get_artist(channelId)
 
-@app.get("/api/youtube/get_artist_albums/{artistId}")
-async def get_artist_albums(artistId: str):
-    return ytmusic.get_artist_albums(artistId)
+@app.get("/api/youtube/get_artist_albums/")
+async def get_artist_albums(channelId: str,
+                            limit: int | None = 100,
+                            order: Literal['Recency', 'Popularity', 'Alphabetical order'] | None = None):
+    params = ytmusic.get_artist(channelId)['albums']['params']
+    return ytmusic.get_artist_albums(channelId, params, limit, order)
 
-@app.get("/api/youtube/get_album/{albumId}")
-async def get_album(albumId: str):
-    return ytmusic.get_album(albumId)
+@app.get("/api/youtube/get_album/")
+async def get_album(browseId: str):
+    return ytmusic.get_album(browseId)
 
-@app.get("/api/youtube/get_album_browse_id/{albumId}")
-async def get_album_browse_id(albumId: str):
-    return ytmusic.get_album_browse_id(albumId)
+@app.get("/api/youtube/get_album_browse_id/")
+async def get_album_browse_id(audioPlaylistId: str):
+    return ytmusic.get_album_browse_id(audioPlaylistId)
 
 @app.get("/api/youtube/get_user")
-async def get_user():
-    return ytmusic.get_user()
+async def get_user(channelId: str):
+    return ytmusic.get_user(channelId)
 
 @app.get("/api/youtube/get_user_playlists")
-async def get_user_playlists():
-    return ytmusic.get_user_playlists()
+async def get_user_playlists(channelId: str):
+    params = ytmusic.get_user(channelId)['playlists']['params']
+    return ytmusic.get_user_playlists(channelId, params)
 
 @app.get("/api/youtube/get_user_videos")
-async def get_user_videos():
-    return ytmusic.get_user_videos()
+async def get_user_videos(channelId: str):
+    params = ytmusic.get_user(channelId)['videos']['params']
+    return ytmusic.get_user_videos(channelId, params)
 
-@app.get("/api/youtube/get_song/{songId}")
-async def get_song(songId: str):
-    return ytmusic.get_song(songId)
+@app.get("/api/youtube/get_song/")
+async def get_song(videoId: str,
+                   signatureTimestamp: int | None = None):
+    return ytmusic.get_song(videoId, signatureTimestamp)
 
-@app.get("/api/youtube/get_song_related/{songId}")
-async def get_song_related(songId: str):
-    return ytmusic.get_song_related(songId)
+@app.get("/api/youtube/get_song_related/")
+async def get_song_related(browseId: str):
+    return ytmusic.get_song_related(browseId)
 
-@app.get("/api/youtube/get_lyrics/{songId}")
-async def get_lyrics(songId: str):
-    return ytmusic.get_lyrics(songId)
+@app.get("/api/youtube/get_lyrics/")
+async def get_lyrics(browseId: str,
+                    timestamps: bool | None = False):
+    return ytmusic.get_lyrics(browseId, timestamps)
 
 @app.get("/api/youtube/get_tasteprofile")
 async def get_tasteprofile():
     return ytmusic.get_tasteprofile()
 
 @app.post("/api/youtube/set_tasteprofile")
-async def set_tasteprofile(profile: dict):
-    return ytmusic.set_tasteprofile(profile)
+async def set_tasteprofile(artists: list[str], taste_profile: dict | None = None):
+    return ytmusic.set_tasteprofile(artists, taste_profile)
 
 @app.get("/api/youtube/get_mood_categories")
 async def get_mood_categories():
     return ytmusic.get_mood_categories()
 
 @app.get("/api/youtube/get_mood_playlists")
-async def get_mood_playlists():
-    return ytmusic.get_mood_playlists()
+async def get_mood_playlists(params: str):
+    params = ytmusic.get_mood_categories()['playlists']['params']
+    return ytmusic.get_mood_playlists(params)
 
 @app.get("/api/youtube/get_charts")
 async def get_charts():
