@@ -2,15 +2,7 @@ from fastapi import FastAPI, HTTPException
 from ytmusicapi import YTMusic
 
 app = FastAPI()
-ytmusic = YTMusic('headers_auth.json')  # Replace with your actual headers file
-
-@app.post("/api/youtube/setup")
-async def setup():
-    return ytmusic.setup()
-
-@app.post("/api/youtube/setup_oauth")
-async def setup_oauth():
-    return ytmusic.setup_oauth()
+ytmusic = YTMusic()
 
 @app.get("/api/youtube/search")
 async def search(query: str):
