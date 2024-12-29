@@ -1,9 +1,22 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, CORSMiddleware
 from ytmusicapi import YTMusic
 from typing import Any, Literal
 
-app = FastAPI()
 ytmusic = YTMusic()
+
+app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/youtube/search/")
 async def search(query: str,
