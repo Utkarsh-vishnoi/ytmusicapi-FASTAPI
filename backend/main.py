@@ -1,9 +1,24 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from ytmusicapi import YTMusic
+from ytmusicapi import YTMusic, OAuthCredentials
 from typing import Any, Literal
+from dotenv import load_dotenv
+import os
 
-ytmusic = YTMusic()
+# Load environment variables
+load_dotenv()
+
+# Get credentials from environment variables
+CLIENT_ID = os.getenv('YOUTUBE_CLIENT_ID')
+CLIENT_SECRET = os.getenv('YOUTUBE_CLIENT_SECRET')
+
+if not CLIENT_ID or not CLIENT_SECRET:
+    raise ValueError("Missing required environment variables: YOUTUBE_CLIENT_ID and/or YOUTUBE_CLIENT_SECRET")
+
+ytmusic = YTMusic('/etc/secrets/oauth.json', oauth_credentials=OAuthCredentials(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET
+))
 
 app = FastAPI()
 
@@ -291,4 +306,4 @@ async def delete_upload_entity(entityId: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    uvicorn.run(app, host="0.0.0.0", port=8001) 
