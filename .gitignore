@@ -1,5 +1,3 @@
-frontend/
-checklist.md
-music-scraper/
-Auralist/
+/frontend
+/scraper
 .env

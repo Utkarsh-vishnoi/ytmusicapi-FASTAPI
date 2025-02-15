@@ -15,7 +15,7 @@ CLIENT_SECRET = os.getenv('YOUTUBE_CLIENT_SECRET')
 if not CLIENT_ID or not CLIENT_SECRET:
     raise ValueError("Missing required environment variables: YOUTUBE_CLIENT_ID and/or YOUTUBE_CLIENT_SECRET")
 
-ytmusic = YTMusic('/etc/secrets/oauth.json', oauth_credentials=OAuthCredentials(
+ytmusic = YTMusic('oauth.json', oauth_credentials=OAuthCredentials(
     client_id=CLIENT_ID,
     client_secret=CLIENT_SECRET
 ))
@@ -56,16 +56,16 @@ async def remove_search_suggestions(suggestions: list[dict[str, Any]],
 async def get_home(limit: int = 3):
     return ytmusic.get_home(limit)
 
-@app.get("/api/youtube/get_artist/")
+@app.get("/api/youtube/get_artist")
 async def get_artist(channelId: str):
     return ytmusic.get_artist(channelId)
 
-@app.get("/api/youtube/get_artist_albums/")
-async def get_artist_albums(channelId: str,
+@app.get("/api/youtube/get_artist_albums")
+async def get_artist_albums(browseId: str,
+                            params: str,
                             limit: int | None = 100,
                             order: Literal['Recency', 'Popularity', 'Alphabetical order'] | None = None):
-    params = ytmusic.get_artist(channelId)['albums']['params']
-    return ytmusic.get_artist_albums(channelId, params, limit, order)
+    return ytmusic.get_artist_albums(browseId, params, limit, order)
 
 @app.get("/api/youtube/get_album/")
 async def get_album(browseId: str):
@@ -211,7 +211,7 @@ async def unsubscribe_artists(channelIds: list[str]):
 async def get_account_info():
     return ytmusic.get_account_info()
 
-@app.get("/api/youtube/get_playlist/")
+@app.get("/api/youtube/get_playlist")
 async def get_playlist(playlistId: str,
                        limit: int | None = 100,
                        related: bool = False,
