@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from ytmusicapi import YTMusic, OAuthCredentials
 from typing import Any, Literal
 from dotenv import load_dotenv
@@ -11,9 +12,11 @@ load_dotenv()
 # Get credentials from environment variables
 CLIENT_ID = os.getenv('YOUTUBE_CLIENT_ID')
 CLIENT_SECRET = os.getenv('YOUTUBE_CLIENT_SECRET')
+API_USERNAME = os.getenv('API_USERNAME')
+API_PASSWORD = os.getenv('API_PASSWORD')
 
-if not CLIENT_ID or not CLIENT_SECRET:
-    raise ValueError("Missing required environment variables: YOUTUBE_CLIENT_ID and/or YOUTUBE_CLIENT_SECRET")
+if not all([CLIENT_ID, CLIENT_SECRET, API_USERNAME, API_PASSWORD]):
+    raise ValueError("Missing required environment variables")
 
 ytmusic = YTMusic('oauth.json', oauth_credentials=OAuthCredentials(
     client_id=CLIENT_ID,
@@ -33,6 +36,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create middleware for basic auth
+@app.middleware("http")
+async def authenticate(request: Request, call_next):
+    if request.url.path.startswith("/api"):
+        auth = request.headers.get("Authorization", "")
+        if not auth.startswith("Basic "):
+            raise HTTPException(status_code=401, detail="Missing authentication")
+        
+        try:
+            import base64
+            auth_decoded = base64.b64decode(auth.split(" ")[1]).decode("utf-8")
+            username, password = auth_decoded.split(":")
+            
+            if username != API_USERNAME or password != API_PASSWORD:
+                raise HTTPException(status_code=401, detail="Invalid credentials")
+        except Exception:
+            raise HTTPException(status_code=401, detail="Invalid authentication format")
+    
+    response = await call_next(request)
+    return response
 
 @app.get("/api/youtube/search/")
 async def search(query: str,
