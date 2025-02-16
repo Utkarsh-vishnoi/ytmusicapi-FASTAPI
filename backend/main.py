@@ -67,7 +67,7 @@ async def get_artist_albums(browseId: str,
                             order: Literal['Recency', 'Popularity', 'Alphabetical order'] | None = None):
     return ytmusic.get_artist_albums(browseId, params, limit, order)
 
-@app.get("/api/youtube/get_album/")
+@app.get("/api/youtube/get_album")
 async def get_album(browseId: str):
     return ytmusic.get_album(browseId)
 
