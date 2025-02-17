@@ -5,6 +5,5 @@ services:
     runtime: python
     plan: free
     autoDeploy: false
-    buildCommand: pip install -r requirements.txt
-    preDeployCommand: prisma migrate deploy
-    startCommand: prisma generate && uvicorn main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt && prisma migrate deploy && prisma generate
+    startCommand: prisma migrate deploy && uvicorn main:app --host 0.0.0.0 --port $PORT
