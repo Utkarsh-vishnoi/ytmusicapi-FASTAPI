@@ -1,0 +1,34 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-py"
+}
+
+model Artist {
+  id        String      @id
+  name      String
+  albums    Album[]
+  songs     Song[]
+}
+
+model Album {
+  id        String      @id
+  title     String
+  year      String
+  artistId  String
+  artist    Artist   @relation(fields: [artistId], references: [id])
+  songs     Song[]
+}
+
+model Song {
+  id        String      @id
+  title     String
+  duration  Int
+  artistId  String
+  albumId   String?
+  artist    Artist   @relation(fields: [artistId], references: [id])
+  album     Album?   @relation(fields: [albumId], references: [id])
+}

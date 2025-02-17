@@ -1,4 +1,3 @@
-/frontend
-/scraper
 .env
 oauth.json
+__pycache__/
