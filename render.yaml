@@ -7,4 +7,4 @@ services:
     autoDeploy: false
     buildCommand: pip install -r requirements.txt
     preDeployCommand: prisma migrate deploy
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: prisma generate && uvicorn main:app --host 0.0.0.0 --port $PORT
