@@ -1,3 +1,4 @@
 .env
 oauth.json
 __pycache__/
+prisma/dev.db
