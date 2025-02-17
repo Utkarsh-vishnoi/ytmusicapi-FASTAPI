@@ -2,3 +2,4 @@
 oauth.json
 __pycache__/
 prisma/dev.db
+prisma/dev.db-journal
